@@ -119,14 +119,30 @@ function iniciarApp() {
                 const ingredienteLi = document.createElement( 'LI' );
                 ingredienteLi.classList.add( 'list-group-item' );
                 ingredienteLi.textContent = `${ingrediente}   -   ${cantidad}`;
-
                 listGroup.appendChild( ingredienteLi );
-
-                console.log( `ingrediente: ${ingrediente} - ${cantidad}` )
             }
         }
 
+        // Añade los detalles de ingredientes y cantidades a la ventana Modal
         modalBody.appendChild( listGroup );
+
+        // Botones de Favorito y Cerrar
+        const modalFooter = document.querySelector( '.modal-footer' );
+        limpiarHTML( modalFooter );
+
+        const btnFavorito = document.createElement( 'BUTTON' );
+        btnFavorito.classList.add( 'btn', 'btn-danger', 'col' );
+        btnFavorito.textContent = 'Guardar Favorito';
+
+        const btnCerrarModal = document.createElement( 'BUTTON' );
+        btnCerrarModal.classList.add( 'btn', 'btn-secondary', 'col' );
+        btnCerrarModal.textContent = 'Cerrar';
+        btnCerrarModal.onclick = function () {
+            modal.hide();
+        }
+
+        modalFooter.appendChild( btnFavorito );
+        modalFooter.appendChild( btnCerrarModal );
 
         // Muestra el modal
         modal.show();
