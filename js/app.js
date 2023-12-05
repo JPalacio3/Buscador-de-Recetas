@@ -1,18 +1,24 @@
 function iniciarApp() {
 
     const selectCategorias = document.querySelector( '#categorias' );
-    selectCategorias.addEventListener( 'change', seleccionarCategoria );
     const resultado = document.querySelector( '#resultado' );
     const modal = new bootstrap.Modal( '#modal', {} );
 
-    obtenerCategorias();
+    if ( selectCategorias ) {
+        selectCategorias.addEventListener( 'change', seleccionarCategoria );
+        obtenerCategorias();
+    }
+
+    const favoritosDiv = document.querySelector( '.favoritos' );
+    if ( favoritosDiv ) {
+        obtenerFavoritos();
+    }
 
     function obtenerCategorias() {
         const url = 'https://www.themealdb.com/api/json/v1/1/categories.php';
         fetch( url )
             .then( respuesta => respuesta.json() )
             .then( resultado => mostrarCategorias( resultado.categories ) )
-
     }
 
     // Función que se encarga de listar las categorías en el option del HTML
@@ -57,15 +63,15 @@ function iniciarApp() {
 
             const recetaImagen = document.createElement( 'IMG' );
             recetaImagen.classList.add( 'card-img-top' );
-            recetaImagen.alt = `imagen de la receta ${strMeal}`;
-            recetaImagen.src = strMealThumb;
+            recetaImagen.alt = `imagen de la receta ${strMeal ?? receta.titulo}`;
+            recetaImagen.src = strMealThumb ?? receta.img;
 
             const recetaCardBody = document.createElement( 'DIV' );
             recetaCardBody.classList.add( 'card-body' );
 
             const recetaHeading = document.createElement( 'H3' );
             recetaHeading.classList.add( 'card-title', 'mb-3' );
-            recetaHeading.textContent = strMeal;
+            recetaHeading.textContent = strMeal ?? receta.titulo;
 
             const recetaButton = document.createElement( 'BUTTON' );
             recetaButton.classList.add( 'btn', 'btn-danger', 'w-100' );
@@ -73,7 +79,7 @@ function iniciarApp() {
             // recetaButton.dataset.bsTarget = "#modal";
             // recetaButton.dataset.bsToggle = "modal";
             recetaButton.onclick = function () {
-                seleccionarReceta( idMeal );
+                seleccionarReceta( idMeal ?? receta.id );
             }
 
             // Inyectar en el HTML
@@ -150,13 +156,11 @@ function iniciarApp() {
             } );
             btnFavorito.textContent = 'Eliminar Favorito';
             mostrarToast( 'Agregado Correctamente' );
-
         }
 
         function agregarFavorito( receta ) {
             const favoritos = JSON.parse( localStorage.getItem( 'favoritos' ) ) ?? [];
             localStorage.setItem( 'favoritos', JSON.stringify( [ ...favoritos, receta ] ) );
-
         }
 
         function eliminarFavorito( id ) {
@@ -190,6 +194,20 @@ function iniciarApp() {
 
         // Muestra el modal
         modal.show();
+    }
+
+    // Mostrar los favoritos en el HTML de Mis favoritos
+    function obtenerFavoritos() {
+        const favoritos = JSON.parse( localStorage.getItem( 'favoritos' ) ) ?? [];
+        if ( favoritos.length ) {
+            mostrarRecetas( favoritos );
+            return;
+        }
+
+        const noFavoritos = document.createElement( 'P' );
+        noFavoritos.textContent = 'No hay favoritos aún';
+        noFavoritos.classList.add( 'fs-4', 'text-center', 'font-bold', 'mt-5' );
+        favoritosDiv.appendChild( noFavoritos );
     }
 
     function limpiarHTML( selector ) {
