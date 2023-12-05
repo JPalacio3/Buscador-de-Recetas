@@ -132,7 +132,51 @@ function iniciarApp() {
 
         const btnFavorito = document.createElement( 'BUTTON' );
         btnFavorito.classList.add( 'btn', 'btn-danger', 'col' );
-        btnFavorito.textContent = 'Guardar Favorito';
+        btnFavorito.textContent = existeStorage( idMeal ) ? 'Eiminar Favorito' : 'Guardar Favorito';
+
+        // LocalStorage
+        btnFavorito.onclick = function () {
+            if ( existeStorage( idMeal ) ) {
+                eliminarFavorito( idMeal );
+                btnFavorito.textContent = 'Guardar Favorito';
+                mostrarToast( 'Eliminado Correctamente' );
+                return;
+            }
+
+            agregarFavorito( {
+                id: idMeal,
+                titulo: strMeal,
+                img: strMealThumb
+            } );
+            btnFavorito.textContent = 'Eliminar Favorito';
+            mostrarToast( 'Agregado Correctamente' );
+
+        }
+
+        function agregarFavorito( receta ) {
+            const favoritos = JSON.parse( localStorage.getItem( 'favoritos' ) ) ?? [];
+            localStorage.setItem( 'favoritos', JSON.stringify( [ ...favoritos, receta ] ) );
+
+        }
+
+        function eliminarFavorito( id ) {
+            const favoritos = JSON.parse( localStorage.getItem( 'favoritos' ) ) ?? [];
+            const nuevosFavoritos = favoritos.filter( favorito => favorito.id !== id );
+            localStorage.setItem( 'favoritos', JSON.stringify( nuevosFavoritos ) );
+        }
+
+        function existeStorage( id ) {
+            const favoritos = JSON.parse( localStorage.getItem( 'favoritos' ) ) ?? [];
+            return favoritos.some( favorito => favorito.id === id );
+        }
+
+        function mostrarToast( mensaje ) {
+            const toastDiv = document.querySelector( '#toast' );
+            const toastBody = document.querySelector( '.toast-body' );
+            const toast = new bootstrap.Toast( toastDiv );
+            toastBody.textContent = mensaje;
+            toast.show();
+        }
 
         const btnCerrarModal = document.createElement( 'BUTTON' );
         btnCerrarModal.classList.add( 'btn', 'btn-secondary', 'col' );
